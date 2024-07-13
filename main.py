@@ -114,7 +114,8 @@ async def boardnew(req:Request, id:str=Form(...), title:str=Form(...), content:s
     con.commit()
 
     return route(req, "index.html")
-     
+
+
 
 
 if __name__ == "__main__":
