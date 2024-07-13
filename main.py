@@ -1,9 +1,15 @@
+import re
 import uuid
+import json
 import sqlite3
+import requests
+from bs4 import BeautifulSoup
 from datetime import datetime
 from fastapi.templating import Jinja2Templates
 from fastapi import FastAPI, Request, Form, Response
 from fastapi.responses import RedirectResponse, HTMLResponse
+
+meal_url = 'https://donong-m.goegn.kr/donong-m/main.do'
 
 app = FastAPI()
 templates = Jinja2Templates(directory="html")
@@ -37,18 +43,28 @@ navbar = """
             background-color: #04AA6D;
             color: white;
         }
+        .main {
+            padding : 50px
+        }
     </style>
 <div class="navbar">
     <a class="active" href="/">Home</a>
     <a href="/board">Board</a>
     <a href="/new">New</a>
+    <a href="/weather">Weather</a>
+    <a href="/mealinfo">Meal infomation</a>
     <a href="/about">About</a>
 </div>
 """
 
 
 
+def getWeatherInfo(city):
+    api = f"""http://api.openweathermap.org/data/2.5/weather?q={city}&appid=cd58458f4e6be574662e03941558856e&lang=en&units=metric"""
+    result = requests.get(api)
 
+    data = json.loads(result.text)
+    return data
 
 def getDBConnect():
     con = sqlite3.connect("db.db")
@@ -59,7 +75,20 @@ def route(req, html, script="", data=""):
     global navbar
     return templates.TemplateResponse(html, {"request":req, "navbar":navbar, "script":script, "data":data})
 
+def getLunch():
+    global meal_url
+    response = requests.get(meal_url, verify=False)
 
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    target_element = soup.select_one('#container > div.MC_wrap3 > div > div.con_wrap > div.MC_box7.widgEdit > div > div.inner > ul > li:nth-child(1) > dl > dd')
+
+    if target_element:
+        cleaned_text = re.sub(r'\([^()]*\)', '\n', target_element.text.strip())
+
+        return cleaned_text
+    else:
+        print("해당 요소를 찾을 수 없습니다.")
 
 # route
 @app.get("/", response_class=HTMLResponse)
@@ -103,6 +132,28 @@ async def new(req:Request):
 async def about(req : Request):
     return route(req, "about.html")
 
+@app.get("/weather", response_class=HTMLResponse)
+async def weather(req : Request):
+    weather_data = getWeatherInfo('Seoul')
+    weather_info = {
+    'main': weather_data['weather'][0]['main'],  # 날씨 상태 이름 (Clear, Clouds, 등등)
+    'description': weather_data['weather'][0]['description'],  # 날씨 설명 (맑음, 구름 많음, 등등)
+    'temperature': weather_data['main']['temp'],  # 온도 (섭씨)
+    'humidity': weather_data['main']['humidity'],  # 습도 (%)
+    'wind_speed': weather_data['wind']['speed']  # 풍속 (m/s)
+    }
+
+    return route(req, "weather.html", data=weather_info)
+
+@app.get('/mealinfo', response_class=HTMLResponse)
+async def mealinfo(req : Request):
+    meal = getLunch()
+    print(meal)
+    if meal == None:
+        meal = 'There is no meal today.'
+    return route(req, 'mealinfo.html', data=meal)
+
+
 # api
 @app.post("/newboard")
 async def boardnew(req:Request, id:str=Form(...), title:str=Form(...), content:str=Form(...)):
@@ -114,77 +165,9 @@ async def boardnew(req:Request, id:str=Form(...), title:str=Form(...), content:s
     con.commit()
 
     return route(req, "index.html")
-
-
+     
 
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port = 8000)
-
-
-""" LOGIN SERVICE"""
-# ifguestnavbar = navbar+"""<a href="/login">Login</a>
-# <a href="signup">Sign up</a>
-# </div>"""
-# ifloginednavbar = lambda user: navbar+f"""<a href="/">{user}</a>
-# <a href="/logout">Logout</a>
-# </div>
-# """
-# token = req.cookies.get("logintoken")
-# print(f"token : {token}")
-# if token:
-# con = getDBConnect()
-# cur = con.cursor()
-# cur.execute("SELECT userid FROM login WHERE loginkey = ?", (token,))
-# username = cur.fetchone()
-# print(username[0])
-# if username != []:
-# return templates.TemplateResponse(html, {"request":req, "navbar":ifguestnavbar})
-
-# @app.get("/login/")
-# async def login(req: Request):
-#     return route(req, "login.html")
-
-# @app.post('/firstlogin/')
-# async def firstlogin(req : Request,
-#                     res : Response,
-#                     userid : str=Form(...),
-#                      pw : str=Form(...)):
-#     con = getDBConnect()
-#     cur = con.cursor()
-#     cur.execute("SELECT * FROM user WHERE userid = ? AND pw = ?", (userid, pw))
-#     user = cur.fetchone()  # 사용자 정보 가져오기
-
-#     if user:
-#         print("OK")
-#         login_key = str(uuid.uuid4())
-#         print()
-#         cur.execute("INSERT INTO login (userid, loginkey) VALUES (?, ?)", (userid, login_key))
-#         con.commit()  # 변경사항 커밋
-
-#         expire = datetime.utcnow() + timedelta(days=365*10)  # 10년 후 만료
-#         res.set_cookie(
-#             key="logintoken",
-#             value=login_key,
-#             httponly=True,
-#             # secure=True,  # HTTPS에서만 전송
-#             # samesite="Strict",  # CSRF 방지 
-#             expires=expire.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-#         )
-#         return route(req, "index.html")
-#     else:
-#         print("FUCK")
-#         return HTMLResponse(content='<script>alert("wrong")</script>')
-
-# @app.get("/signin")
-# async def signin(req : Request):
-#     return route(req, "signin.html")
-    
-#     ...
-
-# @app.get("/logout")
-# async def logout(req : Request, res : Response):
-#     res.delete_cookie(key="logintoken", path="/", domain=None, secure=True, httponly=True)
-#     return route(req, "index.html")
-

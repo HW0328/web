@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web</title>
+</head>
+
+<body>
+    {{ navbar|safe }}
+    <div class="main">
+        <h1>Weather</h1>
+        <hr>
+        <h2>weather : {{ data['main'] }}</h2>
+        <h2>weather condition : {{ data['description'] }}</h2>
+        <h2>temperture : {{ data['temperture'] }}</h2>
+        <h2>humidity : {{ data['humidity'] }}</h2>
+        <h2>wind speed : {{ data['wind_speed'] }}</h2>
+        Currently, we only provide weather for Seoul, South Korea. We plan to update other regions in the future.
+    </div>
+</body>
+</html>

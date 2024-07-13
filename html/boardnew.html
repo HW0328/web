@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,11 +30,13 @@
 <body>
     {{ navbar|safe }}
     <!-- hx-post와 hx-trigger 속성을 가진 폼 -->
-    <form hx-post="/newboard" hx-trigger="submit" onsubmit="handleSubmit(event)">
-        <input type="text" name="id" placeholder="Please input username">
-        <input type="text" name="title" placeholder="Please input title">
-        <textarea name="content" placeholder="Please input user content"></textarea>
-        <button type="submit">Submit</button>
-    </form>
+    <div class="main">
+        <form hx-post="/newboard" hx-trigger="submit" onsubmit="handleSubmit(event)">
+            <input type="text" name="id" placeholder="Please input username">
+            <input type="text" name="title" placeholder="Please input title">
+            <textarea name="content" placeholder="Please input user content"></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +8,11 @@
 </head>
 <body>
     {{ navbar|safe }}
-    {% for item in data %}
-    <h3><a href="board/{{ item['id'] }}">{{ item['title'] }}<sub>{{ item['writer'] }}</sub></a></h3>
-    {% endfor %}
+    <div class="main">
+        {% for item in data %}
+        <h3><a href="board/{{ item['id'] }}">{{ item['title'] }}<sub>{{ item['writer'] }}</sub></a></h3>
+        {% endfor %}
+    </div>
 
 </body>
 </html>

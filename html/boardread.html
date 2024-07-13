@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,11 @@
 </head>
 <body>
     {{navbar|safe}}
-    <h1>{{ data['title'] }}</h1>
-    <h2>{{ data['writer'] }} - {{ data['id'] }} - {{ data['date'] }}</h2>
-    <hr>
-    <h3>{{ data['content'] }}</h3>
+    <div class="main">
+        <h1>{{ data['title'] }}</h1>
+        <h2>{{ data['writer'] }} - {{ data['id'] }} - {{ data['date'] }}</h2>
+        <hr>
+        <h3>{{ data['content'] }}</h3>
+    </div>
 </body>
 </html>
