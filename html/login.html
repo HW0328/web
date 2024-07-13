@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@1.8.6"></script>
+    <title>Web</title>
+</head>
+<body>
+    {{navbar|safe}}
+    <form hx-post="/firstlogin" hx-trigger="submit">
+        <input type="text" name="userid" placeholder="Please input user id">
+        <input type="text" name="pw" placeholder="Please input user password">
+        <button type="submit">Submit</button>
+    </form>
+    로그인
+</body>
+</html>

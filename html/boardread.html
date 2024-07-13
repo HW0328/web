@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web</title>
-    
 </head>
 <body>
-    {{ navbar|safe  }}
-    Hello, World!
-    <script>
-        {{ script|safe }}
-    </script>
+    {{navbar|safe}}
+    <h1>{{ data['title'] }}</h1>
+    <h2>{{ data['writer'] }} - {{ data['date'] }}</h2>
+    <hr>
+    <h3>{{ data['content'] }}</h3>
 </body>
 </html>
