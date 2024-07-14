@@ -50,9 +50,10 @@ navbar = """
 <div class="navbar">
     <a class="active" href="/">Home</a>
     <a href="/board">Board</a>
-    <a href="/new">New</a>
+    <a href="/new">New post</a>
     <a href="/weather">Weather</a>
     <a href="/mealinfo">Meal infomation</a>
+    <a href="/random">Random</a>
     <a href="/about">About</a>
 </div>
 """
@@ -152,6 +153,10 @@ async def mealinfo(req : Request):
     if meal == None:
         meal = 'There is no meal today.'
     return route(req, 'mealinfo.html', data=meal)
+
+@app.get("/random")
+async def rand(req : Request):
+    return route(req, 'random.html')
 
 
 # api

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web</title>
+</head>
+<body>
+    {{ navbar|safe }}
+    <div class="main">
+        <h1>Random</h1>
+        <hr>
+        <h2 id="randnum">Number : </h2>
+        <input type="number" id="start" placeholder="Starting number"> <br>
+        <input type="number" id="end" placeholder="Ending number"> <br>
+        <span for="ZQ">Includes rational numbers : </span>
+        <input type="checkbox" id="ZQ" placeholder="Includes rational numbers"> <br>
+        <button onclick="draw()">Draw</button>
+    </div>
+    <script>
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getRandomRational(min, max) {
+            let randomValue = Math.random() * (max - min) + min;
+    let multiplier = 1000; // 원하는 소수점 자릿수에 맞춰서 10의 거듭제곱을 조절
+    let truncatedValue = Math.round(randomValue * multiplier) / multiplier;
+    return truncatedValue;
+        }
+
+        function draw(){
+            const start = document.getElementById('start').value;
+            const end = document.getElementById('end').value;
+            const zq = document.getElementById('ZQ').checked;
+            const num = document.getElementById('randnum')
+            console.log(`start : ${start}`)
+            console.log(`end : ${end}`)
+            console.log(`ZQ : ${zq}`)
+            if (start | end & start < end) {
+                if (zq){
+                    const rand = getRandomRational(start, end) + 1
+                    console.log(rand)
+                    num.innerHTML = `Number : ${rand}`
+                }
+                else {
+                    const rand = getRandomInt(start, end)
+                    num.innerHTML = `Number : ${rand}`
+                }
+            }
+            else {
+                console.log("NOOOOOOOOOOO")
+                num.innerHTML = "Number : "
+            }
+        }
+
+    </script>
+</body>
+</html>
