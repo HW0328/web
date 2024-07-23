@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web</title>
+    <style>
+         
+        #box {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            bottom: 100px;
+            left: 50px;
+        }
+        .obstacle {
+            position: absolute;
+            width: 50px;
+            background-color: red;
+            right: -50px;
+        }
+        .top-obstacle {
+            top: 150px;
+        }
+        .bottom-obstacle {
+            bottom: 100px;
+        }
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: red;
+        }
+        #score {
+            position: absolute;
+            top: 70px;
+            right: 10px;
+            font-size: 24px;
+            color: white;
+            padding: 5px;
+        }
+        
+        
+    </style>
+</head>
+<body>
+    {{ navbar|safe }}
+    <div class="main">
+        Avoiding Game
+        <div id="game">
+            <div id="box"></div>
+            <div id="score">Score: 0</div>
+            <div id="game-over">Game Over</div>
+        </div>
+    </div>
+    <script>
+let jumpInterval;
+let gravityInterval;
+let obstacleInterval;
+let box;
+let bottom = 100;
+const maxJumpHeight = 500;
+const gravity = 1.25; // 중력 강도를 증가시켜 점프를 느리게 만듭니다.
+const jumpPower = 12.5; // 점프의 힘을 줄여 점프를 느리게 만듭니다.
+const obstacleSpeed = 3;
+const obstacleGap = 470; // 장애물 사이의 간격
+const topObstacleMaxHeight = 200; // 위 장애물의 최대 높이
+const topObstacleMinHeight = 50; // 위 장애물의 최소 높이
+let score = 0;
+
+document.addEventListener('keydown', function(event) {
+    if (event.code === 'Space') {
+        if (document.getElementById('game-over').style.display === 'block') {
+            resetGame();
+        } else {
+            jump();
+        }
+    }
+});
+
+function jump() {
+    clearInterval(jumpInterval);
+    clearInterval(gravityInterval);
+
+    let velocity = jumpPower;
+
+    function applyGravity() {
+        velocity -= gravity;
+        bottom += velocity;
+
+        if (bottom >= maxJumpHeight) {
+            bottom = maxJumpHeight;
+            velocity = 0;
+        }
+
+        if (bottom <= 100) {
+            bottom = 100;
+            clearInterval(gravityInterval);
+        }
+
+        box.style.bottom = bottom + 'px';
+        checkCollision();
+    }
+
+    gravityInterval = setInterval(applyGravity, 20);
+}
+
+function createObstacle() {
+    let maxHeight = window.innerHeight - obstacleGap - topObstacleMinHeight;
+
+    let topObstacleHeight = Math.floor(Math.random() * (topObstacleMaxHeight - topObstacleMinHeight + 1)) + topObstacleMinHeight;
+    let bottomObstacleHeight = window.innerHeight - topObstacleHeight - obstacleGap;
+
+    let topObstacle = document.createElement('div');
+    topObstacle.classList.add('obstacle', 'top-obstacle');
+    topObstacle.style.height = topObstacleHeight + 'px';
+
+    let bottomObstacle = document.createElement('div');
+    bottomObstacle.classList.add('obstacle', 'bottom-obstacle');
+    bottomObstacle.style.height = bottomObstacleHeight + 'px';
+
+    document.body.appendChild(topObstacle);
+    document.body.appendChild(bottomObstacle);
+
+    function moveObstacle() {
+        let topObstacleRight = parseInt(window.getComputedStyle(topObstacle).getPropertyValue('right'));
+        topObstacle.style.right = topObstacleRight + obstacleSpeed + 'px';
+        bottomObstacle.style.right = topObstacleRight + obstacleSpeed + 'px';
+
+        if (topObstacleRight > window.innerWidth) {
+            topObstacle.remove();
+            bottomObstacle.remove();
+            clearInterval(moveInterval);
+            increaseScore(); // 점수 증가
+        }
+
+        checkCollision();
+    }
+
+    let moveInterval = setInterval(moveObstacle, 20);
+}
+
+function checkCollision() {
+    let boxRect = box.getBoundingClientRect();
+    let obstacles = document.getElementsByClassName('obstacle');
+
+    for (let obstacle of obstacles) {
+        let obstacleRect = obstacle.getBoundingClientRect();
+
+        if (
+            boxRect.left < obstacleRect.right &&
+            boxRect.right > obstacleRect.left &&
+            boxRect.top < obstacleRect.bottom &&
+            boxRect.bottom > obstacleRect.top
+        ) {
+            gameOver();
+        }
+    }
+}
+
+function increaseScore() {
+    score++;
+    document.getElementById('score').textContent = 'Score: ' + score;
+}
+
+function gameOver() {
+    clearInterval(jumpInterval);
+    clearInterval(gravityInterval);
+    clearInterval(obstacleInterval);
+    document.getElementById('game-over').style.display = 'block';
+    // Stop generating new obstacles
+    clearInterval(obstacleInterval);
+}
+
+function resetGame() {
+    document.getElementById('game-over').style.display = 'none';
+    score = 0;
+    document.getElementById('score').textContent = 'Score: 0';
+    bottom = 100;
+    box.style.bottom = bottom + 'px';
+
+    // Remove all obstacles
+    let obstacles = document.getElementsByClassName('obstacle');
+    while (obstacles.length > 0) {
+        obstacles[0].remove();
+    }
+
+    // Restart obstacle creation
+    obstacleInterval = setInterval(createObstacle, 2000);
+}
+
+// Initialize the game
+box = document.getElementById('box');
+obstacleInterval = setInterval(createObstacle, 2000);
+
+    </script>
+</body>
+</html>

@@ -51,9 +51,10 @@ navbar = """
     <a class="active" href="/">Home</a>
     <a href="/board">Board</a>
     <a href="/new">New post</a>
-    <a href="/weather">Weather</a>
-    <a href="/mealinfo">Meal infomation</a>
     <a href="/random">Random</a>
+    <a href="/weather">Weather</a>
+    <a href="/avoid">Avoiding Game</a>
+    <a href="/mealinfo">Meal infomation</a>
     <a href="/about">About</a>
 </div>
 """
@@ -158,6 +159,9 @@ async def mealinfo(req : Request):
 async def rand(req : Request):
     return route(req, 'random.html')
 
+@app.get("/avoid")
+async def avoiding_game(req : Request):
+    return route(req, 'avoiding_game.html')
 
 # api
 @app.post("/newboard")
