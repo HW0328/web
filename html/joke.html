@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web</title>
+    <script src="https://unpkg.com/htmx.org@1.8.6"></script>
+
+</head>
+<body>
+    {{ navbar|safe }}
+    <div class="main">
+        <h1>Joke</h1>
+        <hr>
+        <div>
+            <div id="joke-new"></div>
+            <hr>
+            <button id="joke" type="button" hx-get="/funny_jokes" hx-target="#joke-new">New joke</button>
+        </div>
+        <button id="ans">Show correct answer</button>
+    </div>
+    <script>
+        const ans = document.getElementById("ans");
+        ans.addEventListener("click", () => {
+            console.log("is run")
+            const ans_show = document.getElementById("ansShow")
+            ans_show.style.opacity = '100%';
+        })
+    </script>
+</body>
+</html>
