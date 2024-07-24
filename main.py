@@ -293,7 +293,7 @@ async def boardnew(req:Request, id:str=Form(...), title:str=Form(...), content:s
     con = getDBConnect()
     cur = con.cursor()
     current_datetime = datetime.now()
-    formatted_date = current_datetime.strftime("%Y년 %m월 %d일 %H시 %M분")
+    formatted_date = current_datetime.strftime("%mMonth %dDay %YYear %HHour %MMinute")
     cur.execute("INSERT INTO board (writer, title, content, date) VALUES (?, ?, ?, ?)", (id, title, content, formatted_date))
     con.commit()
 
